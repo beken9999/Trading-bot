@@ -11,8 +11,8 @@ from telegram.ext import (
 )
 
 # ─── ВСТАВЬТЕ ВАШИ КЛЮЧИ ──────────────────────────────────────
-TELEGRAM_TOKEN = os.getenv("8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk")
-DEEPSEEK_API_KEY = os.getenv("sk-f9476361ef224d82bf5b32b3e225536e")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-f9476361ef224d82bf5b32b3e225536e")
 # ──────────────────────────────────────────────────────────────
 
 # ─── ЗАЩИТА — только владелец может пользоваться ботом ────────
@@ -449,7 +449,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": [
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{photo_b64}"}},
-                    {"type": "text", "text": f"{caption}
+                    {"type": "text", "text": caption + "
 
 Опиши что видишь: тренд, уровни, паттерны. Дай торговую рекомендацию по нашей стратегии холодных лимиток."}
                 ]}
@@ -520,4 +520,4 @@ def main():
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
-    main() 
+    main()   
