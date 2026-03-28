@@ -12,7 +12,7 @@ from telegram.ext import (
 
 # ─── ВСТАВЬТЕ ВАШИ КЛЮЧИ ──────────────────────────────────────
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-f9476***********************536e")
+DEEPSEEK_API_KEY = os.getenv("sk-f9476361ef224d82bf5b32b3e225536e")
 # ──────────────────────────────────────────────────────────────
 
 # ─── ЗАЩИТА — только владелец может пользоваться ботом ────────
@@ -429,6 +429,44 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await thinking_msg.delete()
     await send_long_message(update.message, answer)
 
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    import base64
+    user = update.effective_user
+    if user.id != OWNER_ID:
+        await update.message.reply_text("⛔ Доступ запрещён.")
+        return
+    thinking_msg = await update.message.reply_text("🔍 Анализирую скрин...")
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+    try:
+        photo = update.message.photo[-1]
+        file = await context.bot.get_file(photo.file_id)
+        photo_bytes = await file.download_as_bytearray()
+        photo_b64 = base64.b64encode(photo_bytes).decode("utf-8")
+        caption = update.message.caption or "Проанализируй этот график"
+        payload = {
+            "model": "deepseek-chat",
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{photo_b64}"}},
+                    {"type": "text", "text": caption + "
+
+Опиши что видишь: тренд, уровни, паттерны. Дай торговую рекомендацию по нашей стратегии холодных лимиток."}
+                ]}
+            ],
+            "max_tokens": 1000
+        }
+        headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            r = await client.post(DEEPSEEK_URL, json=payload, headers=headers)
+            r.raise_for_status()
+            answer = r.json()["choices"][0]["message"]["content"]
+        await thinking_msg.delete()
+        await send_long_message(update.message, answer)
+    except Exception as e:
+        logger.error(f"Ошибка анализа фото: {e}")
+        await thinking_msg.delete()
+        await update.message.reply_text("❌ Не удалось проанализировать. Опишите график текстом!")
 
 async def send_long_message(message, text):
     max_len = 4000
@@ -476,6 +514,7 @@ def main():
     app.add_handler(CommandHandler("clear",     cmd_clear))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_error_handler(error_handler)
     logger.info("✅ Бот запущен!")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
