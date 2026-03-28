@@ -12,7 +12,7 @@ from telegram.ext import (
 
 # ─── ВСТАВЬТЕ ВАШИ КЛЮЧИ ──────────────────────────────────────
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-f9476361ef224d82bf5b32b3e225536e")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-f9476***********************536e")
 # ──────────────────────────────────────────────────────────────
 
 # ─── ЗАЩИТА — только владелец может пользоваться ботом ────────
@@ -481,4 +481,4 @@ def main():
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
-    main() 
+    main()
