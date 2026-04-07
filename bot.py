@@ -11,8 +11,8 @@ from telegram.ext import (
 )
 
 # ─── ВСТАВЬТЕ ВАШИ КЛЮЧИ ──────────────────────────────────────
-TELEGRAM_TOKEN = os.getenv("8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk")
-DEEPSEEK_API_KEY = os.getenv("sk-f9476***********************536e")
+TELEGRAM_TOKEN="8185689201:AAEoD9gbD6XkVZZ8hQjwAFXrzw0F0KneZbk"
+DEEPSEEK_API_KEY="sk-f9476***********************536e"
 # ──────────────────────────────────────────────────────────────
 
 # ─── ЗАЩИТА — только владелец может пользоваться ботом ────────
